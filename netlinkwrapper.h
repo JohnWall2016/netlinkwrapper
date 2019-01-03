@@ -21,6 +21,7 @@ class NetLinkWrapper : public node::ObjectWrap
         static void Connect(const v8::FunctionCallbackInfo<v8::Value>& args);
         static void Blocking(const v8::FunctionCallbackInfo<v8::Value>& args);
         static void Read(const v8::FunctionCallbackInfo<v8::Value>& args);
+        static void ReadBuffer(const v8::FunctionCallbackInfo<v8::Value>& args);
         static void Write(const v8::FunctionCallbackInfo<v8::Value>& args);
         static void Disconnect(const v8::FunctionCallbackInfo<v8::Value>& args);
 

@@ -42,6 +42,17 @@ module.exports = netlinksocket.NetLinkWrapper;
  */
 
 /**
+ * Reads a socket for data. Basically a replacement for on('data');
+ *
+ * @function readBuffer
+ * @memberof netlinkwrapper
+ * @instance
+ * @param {number} buffer - How many bytes to read from the buffer
+ * @param {boolean} [blocking] - If passed sets the blocking mode, as if you called blocking()
+ * @return {Buffer} the buffer read from the socket, or undefined if no data to read
+ */
+
+/**
  * Writes data to the socket
  *
  * @function write

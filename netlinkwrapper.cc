@@ -31,6 +31,7 @@ void NetLinkWrapper::Init(Handle<Object> exports)
     NODE_SET_PROTOTYPE_METHOD(tpl, "connect", Connect);
     NODE_SET_PROTOTYPE_METHOD(tpl, "blocking", Blocking);
     NODE_SET_PROTOTYPE_METHOD(tpl, "read", Read);
+    NODE_SET_PROTOTYPE_METHOD(tpl, "readBuffer", ReadBuffer);
     NODE_SET_PROTOTYPE_METHOD(tpl, "write", Write);
     NODE_SET_PROTOTYPE_METHOD(tpl, "disconnect", Disconnect);
 
@@ -186,6 +187,53 @@ void NetLinkWrapper::Read(const FunctionCallbackInfo<Value>& args)
     {
         std::string read(buffer, bufferRead);
         args.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, read.c_str()));
+    }
+    //else it did not read any data, so this will return undefined
+
+    delete[] buffer;
+}
+
+void NetLinkWrapper::ReadBuffer(const FunctionCallbackInfo<Value>& args)
+{
+    Isolate* isolate = Isolate::GetCurrent();
+    HandleScope scope(isolate);
+
+    NetLinkWrapper* obj = ObjectWrap::Unwrap<NetLinkWrapper>(args.Holder());
+
+    if((args.Length() != 1 && args.Length() != 2) || !args[0]->IsNumber())
+    {
+        isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "'read' first argument must be a number representing how many bytes to try to read")));
+        return;
+    }
+    size_t bufferSize = (int)args[0]->NumberValue();
+    char* buffer = new char[bufferSize];
+
+    if(args.Length() == 2 && args[0]->IsBoolean()) {
+        try
+        {
+            obj->socket->blocking(args[1]->BooleanValue());
+        }
+        catch(NL::Exception& e)
+        {
+            isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, e.what())));
+            return;
+        }
+    }
+
+    int bufferRead = 0;
+    try
+    {
+        bufferRead = obj->socket->read(buffer, bufferSize);
+    }
+    catch(NL::Exception& e)
+    {
+        isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, e.what())));
+        return;
+    }
+
+    if(bufferRead > -1 && bufferRead <= (int)bufferSize) // range check
+    {
+        args.GetReturnValue().Set(Nan::CopyBuffer(buffer, bufferRead).ToLocalChecked());
     }
     //else it did not read any data, so this will return undefined
 

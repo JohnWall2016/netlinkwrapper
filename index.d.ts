@@ -57,6 +57,17 @@ declare class NetLinkWrapper {
     read(buffer: number, blocking?: boolean): string | undefined;
 
     /**
+     * Reads a socket for data. Basically a replacement for on('data');
+     *
+     * @param {number} buffer - How many bytes to read from the buffer.
+     * @param {boolean} [blocking] - If passed sets the blocking mode,
+     * the same as if you called `blocking()` prior to calling `read()`.
+     * @returns The buffer read from the socket,
+     * or undefined if no data to read.
+     */
+    readBuffer(buffer: number, blocking?: boolean): Buffer | undefined;
+
+    /**
      * Writes data to the socket.
      *
      * @param {string} data - The data to write to the socket.
